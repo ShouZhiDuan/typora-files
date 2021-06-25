@@ -39,7 +39,7 @@ query_cache_limit=2M
 
 ## 2、初始化MySQL结构以及数据(数据库名见工程中datasourse配置)
 
-![image-20210526094155359](C:\Users\dev\AppData\Roaming\Typora\typora-user-images\image-20210526094155359.png)
+![image-20210526094832227](C:\Users\dev\AppData\Roaming\Typora\typora-user-images\image-20210526094832227.png)
 
 用工程里的medusa_license_db-mysql.sql脚本初始化。
 
