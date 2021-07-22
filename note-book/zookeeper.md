@@ -316,9 +316,21 @@ public class ACLClientTest {
 
 
 
+## Curator 分布式锁
 
+### 1、原理
 
+- 节点唯一性
+- 节点有序性：每个客户端只会监听比自己小一个的加点删除事件。
 
+### 2、锁的几种类型
+
+- 分布式可重入排它锁
+  - InterProcessMutex
+- 分布式排它锁
+  - InterProcessSemaphoreMutex
+- 分布式读写锁
+  - InterProcessReadWriteLock
 
 
 
