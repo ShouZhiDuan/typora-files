@@ -332,7 +332,12 @@ public class ACLClientTest {
 - 分布式读写锁
   - InterProcessReadWriteLock
 
+## Leader选举
 
+- leader latch 不得再次参与master选举
+  - spark
+  - kafka
+- leader selector 可以再次参与master选举
 
 
 
