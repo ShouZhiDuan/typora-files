@@ -215,3 +215,93 @@ kubectl delete -f dsz-nginx-pod.yaml
 pod "dsz-nginx-pod" deleted 移除成功
 ```
 
+## 四、k8s常用组件
+
+### 1、ReplicationController(RC)
+
+> ReplicationController定义了一个期望的场景，即声明某种Pod的副本数量在任意时刻都符合某个预期值，所以RC的定义包含以下几个部分：
+>
+> - Pod期待的副本数（replicas）
+> - 用于筛选目标Pod的Label Selector
+> - 当Pod的副本数量小于预期数量时，用于创建新Pod的Pod模板（template）
+>
+> 也就是说通过RC实现了集群中Pod的高可用，减少了传统IT环境中手工运维的工作。
+
+- 创建dsz-replication-controller.yaml
+
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-nginx
+spec:
+  replicas: 3 #指定高可用副本nginx数量
+  selector:
+    app: rc-nginx
+  template:
+    metadata:
+      name: nginx
+      labels:
+        app: rc-nginx #标签用于扩缩容标记
+    spec:
+      containers:
+      - name: rc-nginx
+        image: nginx #通过改变RC里Pod模板中的镜像版本，可以实现Pod的升级功能
+        ports:
+        - containerPort: 80
+```
+
+- 启动 会启动3个nginx
+
+  > Controller Manager（见本文最前面的架构图）能够及时发现，然后根据RC的定义，创建一个新的Pod。
+
+```
+kubectl apply -f dsz-replication-controller.yaml
+```
+
+- 手动扩缩容
+
+```shell
+kubectl scale rc rc-nginx --replicas=2
+```
+
+- 模拟挂掉一个，会重新帮我们重启一个
+
+```shell
+kubectl delete pods rc-nginx-qp7pf
+kubectl get pods 
+发现还是原来定义replicas的数量，只是上面删除的pod不在了重新启动了一个
+```
+
+### 2、ReplicaSet(RS)
+
+> 在Kubernetes v1.2时，RC就升级成了另外一个概念：Replica Set，官方解释为“下一代RC”
+>
+> ReplicaSet和RC没有本质的区别，kubectl中绝大部分作用于RC的命令同样适用于RS
+>
+> RS与RC唯一的区别是：RS支持基于集合的Label Selector（Set-based selector），而RC只支持基于等式的Label Selector（equality-based selector），这使得Replica Set的功能更强
+
+`注意`
+
+> 一般情况下，我们很少单独使用Replica Set，它主要是被Deployment这个更高的资源对象所使用，从而形成一整套Pod创建、删除、更新的编排机制。当我们使用Deployment时，无须关心它是如何创建和维护Replica Set的，这一切都是自动发生的。同时，无需担心跟其他机制的不兼容问题（比如ReplicaSet不支持rolling-update但Deployment支持）。
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  name: frontend
+spec:
+  matchLabels: 
+    tier: frontend
+  matchExpressions: 
+    - {key:tier,operator: In,values: [frontend]}
+  template:
+  ...
+```
+
+
+
+
+
+
+
